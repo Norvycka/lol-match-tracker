@@ -22,3 +22,18 @@ match_response = httpx.get(match_url, headers={"X-Riot-Token": API_KEY})
 
 print("status:", match_response.status_code)
 print(match_response.json())
+
+match_ids = match_response.json()
+first_id = match_ids[0]
+print("first match:", first_id)
+
+specmatch = f"https://europe.api.riotgames.com/lol/match/v5/matches/{first_id}"
+details_response = httpx.get(specmatch, headers={"X-Riot-Token": API_KEY})
+details = details_response.json()
+
+for player in details["info"]["participants"]:
+    if player["puuid"] == puuid:
+        print(player["championName"], player["kills"], player["deaths"], player["win"])
+
+
+# player = details["info"]["participants"][0]
