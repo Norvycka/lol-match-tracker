@@ -23,6 +23,7 @@ match_response = httpx.get(match_url, headers={"X-Riot-Token": API_KEY})
 print("status:", match_response.status_code)
 print(match_response.json())
 
+
 match_ids = match_response.json()
 first_id = match_ids[0]
 print("first match:", first_id)
@@ -35,5 +36,6 @@ for player in details["info"]["participants"]:
     if player["puuid"] == puuid:
         print(player["championName"], player["kills"], player["deaths"], player["win"])
 
+# my_games = []
 
-# player = details["info"]["participants"][0]
+# for match_id in match_ids:
