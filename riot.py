@@ -1,6 +1,7 @@
 import os
 import httpx
 from dotenv import load_dotenv
+from stats import win_rate
 
 load_dotenv()  # read .env into the environment
 API_KEY = os.getenv("RIOT_API_KEY")
@@ -12,7 +13,9 @@ TAG_LINE = os.getenv("TAG_LINE")  # the part after the #
 url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{GAME_NAME}/{TAG_LINE}"
 response = httpx.get(url, headers={"X-Riot-Token": API_KEY})
 
-print("status:", response.status_code)
+print(
+    "status:", response.status_code
+)  # checks if data found through api call, status code
 print(response.json())
 
 puuid = response.json()["puuid"]  # take the puuid out of request 1's answer
@@ -36,6 +39,22 @@ for player in details["info"]["participants"]:
     if player["puuid"] == puuid:
         print(player["championName"], player["kills"], player["deaths"], player["win"])
 
-# my_games = []
+my_games = []
 
-# for match_id in match_ids:
+for match_id in match_ids:
+    specmatch = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
+    details_response = httpx.get(specmatch, headers={"X-Riot-Token": API_KEY})
+    details = details_response.json()
+    for player in details["info"]["participants"]:
+        if player["puuid"] == puuid:
+            my_games.append(
+                {
+                    "champion": player["championName"],
+                    "kills": player["kills"],
+                    "deaths": player["deaths"],
+                    "win": player["win"],
+                }
+            )
+
+print(my_games)
+print("my win rate:", win_rate(my_games))
