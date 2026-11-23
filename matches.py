@@ -10,7 +10,7 @@ matches = [
 ]
 
 
-# print(win_rate(matches))
+print(win_rate(matches), "expected 40.0")
 
 
 test1 = [{"win": False}, {"win": False}, {"win": False}, {"win": True}, {"win": False}]
