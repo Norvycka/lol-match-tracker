@@ -2,6 +2,7 @@ import os
 import httpx
 from dotenv import load_dotenv
 from stats import win_rate
+from stats import current_streak
 
 load_dotenv()  # read .env into the environment
 API_KEY = os.getenv("RIOT_API_KEY")
@@ -29,15 +30,15 @@ print(match_response.json())
 
 match_ids = match_response.json()
 first_id = match_ids[0]
-print("first match:", first_id)
+# print("first match:", first_id)
 
-specmatch = f"https://europe.api.riotgames.com/lol/match/v5/matches/{first_id}"
-details_response = httpx.get(specmatch, headers={"X-Riot-Token": API_KEY})
-details = details_response.json()
+# specmatch = f"https://europe.api.riotgames.com/lol/match/v5/matches/{first_id}"
+# details_response = httpx.get(specmatch, headers={"X-Riot-Token": API_KEY})
+# details = details_response.json()
 
-for player in details["info"]["participants"]:
-    if player["puuid"] == puuid:
-        print(player["championName"], player["kills"], player["deaths"], player["win"])
+# for player in details["info"]["participants"]:
+#     if player["puuid"] == puuid:
+#         print(player["championName"], player["kills"], player["deaths"], player["win"])
 
 my_games = []
 
@@ -58,3 +59,6 @@ for match_id in match_ids:
 
 print(my_games)
 print("my win rate:", win_rate(my_games))
+
+test = [{"win": False}, {"win": False}, {"win": False}, {"win": True}, {"win": False}]
+print(current_streak(test))  # you predicted ... ?

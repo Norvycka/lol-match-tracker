@@ -1,4 +1,5 @@
 from stats import win_rate
+from stats import win_rate, current_streak
 
 matches = [
     {"champion": "Rengar", "kills": 12, "deaths": 3, "win": True},
@@ -9,13 +10,13 @@ matches = [
 ]
 
 
-# def win_rate(games):
-#     total = len(games)
-#     wins = 0
-#     for game in games:
-#         if game["win"] == True:
-#             wins = wins + 1
-#     return wins / total * 100
+# print(win_rate(matches))
 
 
-print(win_rate(matches))
+test1 = [{"win": False}, {"win": False}, {"win": False}, {"win": True}, {"win": False}]
+test2 = [{"win": True}, {"win": False}, {"win": True}, {"win": True}, {"win": True}]
+test3 = [{"win": True}, {"win": True}, {"win": True}, {"win": True}, {"win": True}]
+
+print(current_streak(test1), "expected 3L")
+print(current_streak(test2), "expected 1W")
+print(current_streak(test3), "expected 5W")
