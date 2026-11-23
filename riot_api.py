@@ -30,8 +30,21 @@ def get_match(match_id):
     return response.json()  # the data, not the envelope
 
 
-puuid = get_puuid("KoKayn", "Vycka")
-ids = get_match_ids(puuid, 3)
-print(ids)  # should be 3 IDs
-match = get_match(ids[0])
-print(match["info"]["gameDuration"])  # length of your last game, in seconds
+def find_player(match, puuid):
+    for player in match["info"]["participants"]:
+        if player["puuid"] == puuid:
+            return {
+                "champion": player["championName"],
+                "kills": player["kills"],
+                "deaths": player["deaths"],
+                "win": player["win"],
+            }
+
+
+if __name__ == "__main__":
+    puuid = get_puuid("KoKayn", "Vycka")
+    ids = get_match_ids(puuid, 3)
+    print(ids)  # should be 3 IDs
+    match = get_match(ids[0])
+    print(match["info"]["gameDuration"])  # length of your last game, in seconds
+    print(find_player(get_match(ids[0]), get_puuid("KoKayn", "Vycka")))
