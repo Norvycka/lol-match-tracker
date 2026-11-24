@@ -8,11 +8,20 @@ async def get_match_async(
     client: httpx.AsyncClient, match_id: str, sem: asyncio.Semaphore, start: float
 ) -> dict:
     async with sem:
-        print(f"{time.perf_counter() - start:5.2f}s  START {match_id}")
         url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
-        response = await client.get(url, headers=HEADERS)
-        print(f"{time.perf_counter() - start:5.2f}s  done  {match_id}")
-        return response.json()
+        while True:
+            response = await client.get(url, headers=HEADERS)
+
+            if response.status_code == 200:  # success?
+                return response.json()
+
+            if response.status_code == 429:  # rate limited?
+                wait = int(response.headers["Retry-After"])
+                print(f"429! waiting {wait}s before retrying {match_id}")
+                await asyncio.sleep(wait)  # wait, the async way
+
+            else:
+                response.raise_for_status()  # any other error: stop with a clear message
 
 
 async def main():
@@ -29,7 +38,7 @@ async def main():
     # )
 
     start = time.perf_counter()
-    sem = asyncio.Semaphore(10)
+    sem = asyncio.Semaphore(5)
     async with httpx.AsyncClient() as client:
         matches = await asyncio.gather(
             *[get_match_async(client, mid, sem, start) for mid in ids]
