@@ -1,4 +1,7 @@
 def win_rate(games):
+    if len(games) == 0:
+        return None
+
     total = len(games)
     wins = 0
     for game in games:
@@ -8,12 +11,15 @@ def win_rate(games):
 
 
 def current_streak(games):
+    if len(games) == 0:
+        return None
+
     first_result = games[0][
         "win"
     ]  # was the NEWEST game a win or a loss? (True / False)
 
     count = 0
-    
+
     for game in games:
         if game["win"] == first_result:  # same result as the newest game?
             count = count + 1

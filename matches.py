@@ -20,3 +20,6 @@ test3 = [{"win": True}, {"win": True}, {"win": True}, {"win": True}, {"win": Tru
 print(current_streak(test1), "expected 3L")
 print(current_streak(test2), "expected 1W")
 print(current_streak(test3), "expected 5W")
+
+print(win_rate([]), "expected None")
+print(current_streak([]), "expected none")

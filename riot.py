@@ -6,7 +6,9 @@ puuid = get_puuid("KoKayn", "Vycka")
 games = []
 for match_id in get_match_ids(puuid):
     match = get_match(match_id)
-    games.append(find_player(match, puuid))  # what do you append? (use find_player)
+    result = find_player(match, puuid)
+    if find_player is not None:
+        games.append(result)
 
 print("win rate:", win_rate(games))
 print("streak:", current_streak(games))
