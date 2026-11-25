@@ -17,15 +17,7 @@ def get_puuid(game_name: str, tag_line: str) -> str:
     url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
     data = riot_get(url)
     puuid = data["puuid"]
-
-    # response = httpx.get(url, headers=HEADERS)
-    # puuid = response.json()["puuid"]  # take the puuid out of the response
-
     return puuid
-
-
-# print(get_puuid("KoKayn", "Vycka"))
-# print(get_puuid("RaiderGO", "TWTV1"))
 
 
 def get_match_ids(puuid: str, count: int = 5) -> list[str]:
@@ -36,9 +28,6 @@ def get_match_ids(puuid: str, count: int = 5) -> list[str]:
 def get_match(match_id: str) -> dict:
     url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"  # which input goes in the URL?
     return riot_get(url)
-    
-    #response = httpx.get(url, headers=HEADERS)
-    #return response.json()  # the data, not the envelope
 
 
 def find_player(match: dict, puuid: str) -> dict | None:
