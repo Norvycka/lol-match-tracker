@@ -1,33 +1,45 @@
 import os
 import httpx
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 API_KEY = os.getenv("RIOT_API_KEY")
 HEADERS = {"X-Riot-Token": API_KEY}  # made once, reused by every function
+SEM = asyncio.Semaphore(5)
 
 
-def riot_get(url: str):
-    response = httpx.get(url, headers=HEADERS)
-    response.raise_for_status()  # any bad status → clear error HERE, not 3 steps later
-    return response.json()
+async def riot_get(client: httpx.AsyncClient, url: str) -> dict | list:
+    async with SEM:
+        while True:
+            response = await client.get(url, headers=HEADERS)
+            if response.status_code == 200:
+                return response.json()
+            if response.status_code == 429:
+                wait = int(response.headers["Retry-After"])
+                print(f"429! waiting {wait}s before retrying {url}")
+                await asyncio.sleep(wait)  # wait, the async way
+
+            else:
+                response.raise_for_status()  # any other error: stop with a clear message
 
 
-def get_puuid(game_name: str, tag_line: str) -> str:
+async def get_puuid(client: httpx.AsyncClient, game_name: str, tag_line: str) -> str:
     url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{game_name}/{tag_line}"
-    data = riot_get(url)
-    puuid = data["puuid"]
-    return puuid
+    data = await riot_get(client, url)
+    return data["puuid"]
 
 
-def get_match_ids(puuid: str, count: int = 5) -> list[str]:
+async def get_match_ids(
+    client: httpx.AsyncClient, puuid: str, count: int = 5
+) -> list[str]:
     match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count={count}"
-    return riot_get(match_url)
+    return await riot_get(client, match_url)
 
 
-def get_match(match_id: str) -> dict:
+async def get_match(client: httpx.AsyncClient, match_id: str) -> dict:
     url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"  # which input goes in the URL?
-    return riot_get(url)
+    return await riot_get(client, url)
 
 
 def find_player(match: dict, puuid: str) -> dict | None:
@@ -39,12 +51,3 @@ def find_player(match: dict, puuid: str) -> dict | None:
                 "deaths": player["deaths"],
                 "win": player["win"],
             }
-
-
-if __name__ == "__main__":
-    puuid = get_puuid("KoKayn", "Vycka")
-    ids = get_match_ids(puuid, 3)
-    print(ids)  # should be 3 IDs
-    match = get_match(ids[0])
-    print(match["info"]["gameDuration"])  # length of your last game, in seconds
-    print(find_player(get_match(ids[0]), get_puuid("KoKayn", "Vycka")))

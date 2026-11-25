@@ -27,3 +27,15 @@ def current_streak(games: list[dict]) -> str | None:
         return f"{count}W"
     else:
         return f"{count}L"
+
+
+def average_kills(games: list[dict]) -> float | None:
+    if len(games) == 0:
+        return None
+
+    total = len(games)
+    killsum = 0
+    for game in games:
+        killsum = killsum + game["kills"]
+    avg = killsum / total
+    return avg

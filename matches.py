@@ -1,5 +1,5 @@
 from stats import win_rate
-from stats import win_rate, current_streak
+from stats import win_rate, current_streak, average_kills
 
 matches = [
     {"champion": "Rengar", "kills": 12, "deaths": 3, "win": True},
@@ -23,3 +23,5 @@ print(current_streak(test3), "expected 5W")
 
 print(win_rate([]), "expected None")
 print(current_streak([]), "expected none")
+
+print(average_kills(matches), "expect avg kills 6.smh")
